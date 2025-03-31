@@ -1,12 +1,13 @@
-import express from "express";
-import cors from "cors";
-import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-
 dotenv.config();
 
-const prisma = new PrismaClient();
+import express from "express";
+import cors from "cors";
+
+import { connectDb } from "./config/db.js";
+
 const app = express();
+app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -16,17 +17,9 @@ app.use(cors());
 // Routes
 app.get("/", (req, res) => res.send("API is running!"));
 
-// Example: Fetch all users
-app.get("/users", async (req, res) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch users" });
-  }
-});
-
 // Start Server
 app.listen(PORT, () => {
+  // Connect to Database
+  connectDb(process.env.MONGO_URL);
   console.log(`Server is running on http://localhost:${PORT}`);
 });
